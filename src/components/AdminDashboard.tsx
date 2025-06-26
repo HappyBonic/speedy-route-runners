@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +61,7 @@ const AdminDashboard = () => {
       dropoff: '456 Oak Ave',
       status: 'delivered',
       date: '2024-01-25',
-      payment: '$12.50'
+      payment: 'R125.00'
     },
     {
       id: 'DEL-002',
@@ -72,7 +71,7 @@ const AdminDashboard = () => {
       dropoff: '321 Elm St',
       status: 'in_transit',
       date: '2024-01-25',
-      payment: '$9.75'
+      payment: 'R97.50'
     }
   ]);
 
@@ -82,7 +81,7 @@ const AdminDashboard = () => {
     totalCustomers: users.filter(u => u.type === 'customer').length,
     totalDeliveries: deliveryLogs.length,
     completedDeliveries: deliveryLogs.filter(d => d.status === 'delivered').length,
-    revenue: deliveryLogs.reduce((sum, d) => sum + parseFloat(d.payment.replace('$', '')), 0)
+    revenue: deliveryLogs.reduce((sum, d) => sum + parseFloat(d.payment.replace('R', '')), 0)
   };
 
   const getStatusColor = (status: string) => {
@@ -148,7 +147,7 @@ const AdminDashboard = () => {
               <Check className="h-8 w-8 text-red-500" />
               <div>
                 <p className="text-sm text-gray-400">Revenue</p>
-                <p className="text-2xl font-bold text-white">${stats.revenue.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-white">R{stats.revenue.toFixed(2)}</p>
               </div>
             </div>
           </CardContent>

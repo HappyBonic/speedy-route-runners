@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ const DriverDashboard = () => {
       dropoff: '456 Oak Ave',
       customer: 'Alice Johnson',
       distance: '2.3 km',
-      payment: '$12.50',
+      payment: 'R125.00',
       status: 'available'
     },
     {
@@ -33,7 +32,7 @@ const DriverDashboard = () => {
       dropoff: '321 Elm St',
       customer: 'Bob Williams',
       distance: '1.8 km',
-      payment: '$9.75',
+      payment: 'R97.50',
       status: 'available'
     }
   ]);
