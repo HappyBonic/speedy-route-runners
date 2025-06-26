@@ -5,9 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Check } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { MapPin, Clock, Check, CreditCard, MessageCircle, Store, Cash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import DeliveryMap from "./DeliveryMap";
+import AlcoholSelection from "./AlcoholSelection";
+import StoreSelection from "./StoreSelection";
+import PaymentOptions from "./PaymentOptions";
+import DriverChat from "./DriverChat";
 
 interface Delivery {
   id: string;
@@ -16,19 +21,48 @@ interface Delivery {
   status: 'pending' | 'accepted' | 'picked_up' | 'delivered';
   driver?: string;
   estimatedTime?: string;
+  items?: AlcoholItem[];
+  totalPrice?: number;
+  paymentMethod?: 'cash' | 'card';
+  store?: string;
+}
+
+interface AlcoholItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  category: string;
 }
 
 const CustomerDashboard = () => {
-  const [pickup, setPickup] = useState('');
-  const [dropoff, setDropoff] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [selectedStore, setSelectedStore] = useState('');
+  const [selectedItems, setSelectedItems] = useState<AlcoholItem[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [showChat, setShowChat] = useState<string | null>(null);
+  const [distance, setDistance] = useState(2.5); // km
   const { toast } = useToast();
 
+  const calculateDeliveryFee = (distance: number) => {
+    const baseRate = 25; // R25 base fee
+    const perKmRate = 15; // R15 per km
+    return baseRate + (distance * perKmRate);
+  };
+
+  const calculateTotal = () => {
+    const itemsTotal = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryFee = calculateDeliveryFee(distance);
+    return itemsTotal + deliveryFee;
+  };
+
   const handleRequestDelivery = () => {
-    if (!pickup || !dropoff) {
+    if (!deliveryAddress || !selectedStore || selectedItems.length === 0) {
       toast({
         title: "Error",
-        description: "Please enter both pickup and drop-off locations",
+        description: "Please complete all fields and select items",
         variant: "destructive"
       });
       return;
@@ -36,33 +70,37 @@ const CustomerDashboard = () => {
 
     const newDelivery: Delivery = {
       id: `DEL-${Date.now()}`,
-      pickup,
-      dropoff,
+      pickup: selectedStore,
+      dropoff: deliveryAddress,
       status: 'pending',
-      estimatedTime: '15-30 mins'
+      estimatedTime: '25-40 mins',
+      items: selectedItems,
+      totalPrice: calculateTotal(),
+      paymentMethod,
+      store: selectedStore
     };
 
     setDeliveries(prev => [newDelivery, ...prev]);
-    setPickup('');
-    setDropoff('');
+    setDeliveryAddress('');
+    setSelectedItems([]);
 
     toast({
-      title: "Delivery Requested",
-      description: "We're finding a driver for you!",
+      title: "Order Placed",
+      description: `Total: R${newDelivery.totalPrice?.toFixed(2)} - Finding a driver!`,
     });
 
-    // Simulate driver acceptance after 3 seconds
+    // Simulate driver acceptance
     setTimeout(() => {
       setDeliveries(prev => 
         prev.map(d => 
           d.id === newDelivery.id 
-            ? { ...d, status: 'accepted', driver: 'John Smith' }
+            ? { ...d, status: 'accepted', driver: 'Sipho Mthembu' }
             : d
         )
       );
       toast({
         title: "Driver Found!",
-        description: "John Smith is on the way to pickup",
+        description: "Sipho Mthembu is heading to the store",
       });
     }, 3000);
   };
@@ -81,7 +119,7 @@ const CustomerDashboard = () => {
     switch (status) {
       case 'pending': return 'Finding Driver';
       case 'accepted': return 'Driver Assigned';
-      case 'picked_up': return 'In Transit';
+      case 'picked_up': return 'Out for Delivery';
       case 'delivered': return 'Delivered';
       default: return status;
     }
@@ -93,36 +131,66 @@ const CustomerDashboard = () => {
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
-              <MapPin className="mr-2 h-5 w-5 text-red-500" />
-              Request Delivery
+              <Store className="mr-2 h-5 w-5 text-red-500" />
+              Order Alcohol
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <StoreSelection 
+              selectedStore={selectedStore}
+              onStoreSelect={setSelectedStore}
+            />
+            
+            {selectedStore && (
+              <AlcoholSelection 
+                selectedItems={selectedItems}
+                onItemsChange={setSelectedItems}
+                store={selectedStore}
+              />
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="pickup" className="text-gray-200">Pickup Location</Label>
+              <Label htmlFor="delivery-address" className="text-gray-200">Delivery Address</Label>
               <Input
-                id="pickup"
-                placeholder="Enter pickup address"
-                value={pickup}
-                onChange={(e) => setPickup(e.target.value)}
+                id="delivery-address"
+                placeholder="Enter your delivery address"
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
                 className="bg-gray-700 border-gray-600 text-white"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="dropoff" className="text-gray-200">Drop-off Location</Label>
-              <Input
-                id="dropoff"
-                placeholder="Enter drop-off address"
-                value={dropoff}
-                onChange={(e) => setDropoff(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white"
-              />
-            </div>
+
+            {selectedItems.length > 0 && (
+              <div className="bg-gray-700 p-4 rounded-lg space-y-2">
+                <h4 className="text-white font-medium">Order Summary</h4>
+                {selectedItems.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm text-gray-300">
+                    <span>{item.name} x{item.quantity}</span>
+                    <span>R{(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between text-sm text-gray-300 pt-2 border-t border-gray-600">
+                  <span>Delivery Fee ({distance}km)</span>
+                  <span>R{calculateDeliveryFee(distance).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-white font-bold">
+                  <span>Total</span>
+                  <span>R{calculateTotal().toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+
+            <PaymentOptions
+              selectedMethod={paymentMethod}
+              onMethodChange={setPaymentMethod}
+            />
+
             <Button 
               onClick={handleRequestDelivery}
               className="w-full bg-red-600 hover:bg-red-700"
+              disabled={!deliveryAddress || !selectedStore || selectedItems.length === 0}
             >
-              Request Delivery
+              Place Order - R{calculateTotal().toFixed(2)}
             </Button>
           </CardContent>
         </Card>
@@ -131,12 +199,12 @@ const CustomerDashboard = () => {
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Clock className="mr-2 h-5 w-5 text-red-500" />
-              Your Deliveries
+              Your Orders
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {deliveries.length === 0 ? (
-              <p className="text-gray-400 text-center py-4">No deliveries yet</p>
+              <p className="text-gray-400 text-center py-4">No orders yet</p>
             ) : (
               deliveries.map((delivery) => (
                 <div key={delivery.id} className="bg-gray-700 p-4 rounded-lg">
@@ -148,14 +216,18 @@ const CustomerDashboard = () => {
                       {getStatusText(delivery.status)}
                     </Badge>
                   </div>
-                  <div className="space-y-1 text-sm text-gray-300">
+                  <div className="space-y-1 text-sm text-gray-300 mb-3">
                     <div className="flex items-center">
-                      <MapPin className="mr-1 h-3 w-3 text-green-500" />
-                      From: {delivery.pickup}
+                      <Store className="mr-1 h-3 w-3 text-green-500" />
+                      Store: {delivery.store}
                     </div>
                     <div className="flex items-center">
                       <MapPin className="mr-1 h-3 w-3 text-red-500" />
                       To: {delivery.dropoff}
+                    </div>
+                    <div className="flex items-center">
+                      <CreditCard className="mr-1 h-3 w-3 text-blue-500" />
+                      Total: R{delivery.totalPrice?.toFixed(2)} ({delivery.paymentMethod})
                     </div>
                     {delivery.driver && (
                       <div className="flex items-center">
@@ -170,6 +242,17 @@ const CustomerDashboard = () => {
                       </div>
                     )}
                   </div>
+                  {delivery.driver && (
+                    <Button
+                      onClick={() => setShowChat(delivery.id)}
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-2"
+                    >
+                      <MessageCircle className="mr-1 h-3 w-3" />
+                      Chat with Driver
+                    </Button>
+                  )}
                 </div>
               ))
             )}
@@ -177,8 +260,15 @@ const CustomerDashboard = () => {
         </Card>
       </div>
 
-      <div>
+      <div className="space-y-6">
         <DeliveryMap />
+        {showChat && (
+          <DriverChat
+            deliveryId={showChat}
+            driverName="Sipho Mthembu"
+            onClose={() => setShowChat(null)}
+          />
+        )}
       </div>
     </div>
   );
