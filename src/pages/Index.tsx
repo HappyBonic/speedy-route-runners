@@ -54,7 +54,7 @@ const Index = () => {
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <MapPin className="h-8 w-8 text-red-500" />
-              <h1 className="text-2xl font-bold text-white">DeliveryPro</h1>
+              <h1 className="text-2xl font-bold text-white">MashigoAlcho_DeliveryPro</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-300 capitalize">{userType}</span>
@@ -75,17 +75,22 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+    <div 
+      className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80')`
+      }}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <MapPin className="h-12 w-12 text-red-500" />
-            <h1 className="text-4xl font-bold text-white">DeliveryPro</h1>
+            <h1 className="text-4xl font-bold text-white">MashigoAlcho_DeliveryPro</h1>
           </div>
           <p className="text-gray-400">Fast, reliable delivery service</p>
         </div>
 
-        <Card className="bg-gray-800 border-gray-700 p-6">
+        <Card className="bg-gray-800 border-gray-700 p-6 bg-opacity-90 backdrop-blur-sm">
           <Tabs defaultValue="customer" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-gray-700">
               <TabsTrigger value="customer" className="data-[state=active]:bg-red-600">
