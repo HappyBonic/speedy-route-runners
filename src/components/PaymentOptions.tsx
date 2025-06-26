@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CreditCard, Cash } from "lucide-react";
+import { CreditCard, Banknote } from "lucide-react";
 
 interface PaymentOptionsProps {
   selectedMethod: 'cash' | 'card';
@@ -68,7 +67,7 @@ const PaymentOptions = ({ selectedMethod, onMethodChange }: PaymentOptionsProps)
           <div className="flex items-center space-x-2 p-3 bg-gray-600 rounded-lg">
             <RadioGroupItem value="cash" id="cash" />
             <Label htmlFor="cash" className="flex items-center cursor-pointer text-white">
-              <Cash className="mr-2 h-4 w-4" />
+              <Banknote className="mr-2 h-4 w-4" />
               Cash on Delivery
             </Label>
           </div>

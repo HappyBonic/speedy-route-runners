@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { MapPin, Clock, Check, CreditCard, MessageCircle, Store, Cash } from "lucide-react";
+import { MapPin, Clock, Check, CreditCard, MessageCircle, Store, Banknote } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import DeliveryMap from "./DeliveryMap";
 import AlcoholSelection from "./AlcoholSelection";
